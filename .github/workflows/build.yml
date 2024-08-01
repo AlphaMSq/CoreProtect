@@ -2,7 +2,7 @@ name: Build
 on:
   push:
     branches:
-      - master
+      - "**"
   pull_request:
     types: [opened, synchronize, reopened]
 jobs:
@@ -24,8 +24,10 @@ jobs:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
+      - name: Set GIT_BRANCH environment variable
+        run: echo "GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD)" >> $GITHUB_ENV
       - name: Build
-        run: mvn -B verify
+        run: mvn -B verify -Dproject.branch=${{ env.GIT_BRANCH }}
       - name: Upload Artifacts
         uses: actions/upload-artifact@v3
         with:
